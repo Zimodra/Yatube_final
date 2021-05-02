@@ -58,7 +58,6 @@ class PostFormTests(TestCase):
         self.authorized_client.force_login(self.user)
         self.authorized_author.force_login(self.author)
 
-
     def test_post(self):
         posts_count = Post.objects.count()
         small_gif = (
@@ -91,14 +90,14 @@ class PostFormTests(TestCase):
                 group=self.group.id,
                 text='Тестовый текст 1',
                 image='posts/small2.gif'
-                ).exists()
+            ).exists()
         )
 
     def test_post_edit(self):
         form_data = {
             'text': 'Измененный текст',
         }
-        response = self.authorized_author.post(
+        self.authorized_author.post(
             reverse(
                 'post_edit', kwargs={
                     'username': self.author, 'post_id': 1

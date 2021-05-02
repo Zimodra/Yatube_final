@@ -206,7 +206,9 @@ class PagesTests(TestCase):
                 'profile_follow', kwargs={'username': self.user}
             ), data=form_data, follow=True
         )
-        self.assertRedirects(response, reverse('profile', kwargs={'username': self.user}))
+        self.assertRedirects(
+            response, reverse('profile', kwargs={'username': self.user})
+        )
         self.assertEqual(Follow.objects.count(), follow_count + 1)
 
     def test_new_post_for_following(self):
