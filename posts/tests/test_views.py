@@ -7,8 +7,8 @@ from django.contrib.auth import get_user_model
 from django.test import Client, TestCase
 from django.urls import reverse
 from django import forms
-
-from posts.models import Group, Post
+from django.core.cache import cache
+from posts.models import Group, Post, Follow, Comment
 
 User = get_user_model()
 
@@ -194,3 +194,52 @@ class PagesTests(TestCase):
         self.assertEqual(response_text, self.post.text)
         self.assertEqual(response_author, self.author)
         self.assertEqual(response_image, self.post.image)
+
+    def test_follow_on_other_authors(self):
+        follow_count = Follow.objects.count()
+        Follow.objects.create(user=self.user, author=self.author)
+        form_data = {
+            'user': 'follower',
+            'author': self.author,
+        }
+        response = self.authorized_client.get(
+            reverse('profile_follow', kwargs={'username': self.user}), data=form_data, follow=True)
+        self.assertRedirects(response, reverse('profile', kwargs={'username': self.user}))
+        self.assertEqual(Follow.objects.count(), follow_count + 1)
+
+    def test_new_post_for_following(self):
+        follow = Follow.objects.create(user=self.user, author=self.author)
+        post = Post.objects.create(
+            text='Пост автора',
+            author=self.author,
+        )
+        response = self.authorized_client.get(reverse('follow_index'))
+        self.assertIn(post, response.context.get('page').paginator.object_list)
+
+    def test_authorized_user_can_comment(self):
+        comments_count = Comment.objects.count()
+        form_data = {
+            'text': 'Комментарий',
+        }
+        response = self.authorized_client.post(
+            reverse('add_comment', kwargs={'username': self.user, 'post_id': 1}), data=form_data, follow=True
+        )
+        self.assertEqual(Comment.objects.count(), comments_count + 1)
+    
+    def test_cache_index_page(self):
+        response_1 = self.authorized_client.get(reverse('index'))
+        post_1 = Post.objects.create(
+            text='Текстовый текст 1', 
+            author=self.author
+        )
+        response_2 = self.authorized_client.get(reverse('index'))
+
+        self.assertEqual(
+            response_1.content, response_2.content)
+
+        cache.clear()
+
+        response_3 = self.authorized_client.get(reverse('index'))
+        
+        self.assertNotEqual(
+            response_2.content, response_3.content)

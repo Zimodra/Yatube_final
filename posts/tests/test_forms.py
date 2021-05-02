@@ -97,17 +97,13 @@ class PostFormTests(TestCase):
 
     def test_post_edit(self):
         form_data = {
-            'text': 'Тестовый текст 1',
-            'group': self.group.id,
+            'text': 'Измененный текст',
         }
-
         response = self.authorized_author.post(
             reverse(
                 'post_edit', kwargs={
-                    'username': PostFormTests.user, 'post_id': PostFormTests.post.id
+                    'username': self.author, 'post_id': 1
                 }
             ), data=form_data, follow=True
         )
-        edited_post = response.context.get('post')
-
-        self.assertEqual(edited_post.text, form_data.context.get('text'))
+        self.assertEqual(Post.objects.all()[0].text, "Измененный текст")
