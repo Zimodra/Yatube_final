@@ -42,6 +42,7 @@ def new_post(request):
     form = PostForm()
     return render(request, 'new.html', {'form': form})
 
+
 def profile(request, username):
     author = get_object_or_404(User, username=username)
     posts_count = author.posts.count()
@@ -64,14 +65,21 @@ def profile(request, username):
         'posts': posts,
         'following': following
     }
-    return render(request, 'profile/profile.html', context) 
+    return render(request, 'profile/profile.html', context)
+
 
 def post_view(request, username, post_id):
     post = get_object_or_404(Post, id=post_id, author__username=username)
     posts_count = post.author.posts.count()
     comments = post.comments.all()
     form = CommentForm()
-    context = {'author': post.author, 'posts_count': posts_count, 'post': post, 'comments': comments, 'form': form}
+    context = {
+        'author': post.author,
+        'posts_count': posts_count,
+        'post': post,
+        'comments': comments,
+        'form': form
+    }
     return render(request, 'profile/post.html', context)
  
  

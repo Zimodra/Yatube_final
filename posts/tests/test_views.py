@@ -202,7 +202,10 @@ class PagesTests(TestCase):
             'author': self.author,
         }
         response = self.authorized_client.get(
-            reverse('profile_follow', kwargs={'username': self.user}), data=form_data, follow=True)
+            reverse(
+                'profile_follow', kwargs={'username': self.user}
+            ), data=form_data, follow=True
+        )
         self.assertRedirects(response, reverse('profile', kwargs={'username': self.user}))
         self.assertEqual(Follow.objects.count(), follow_count + 1)
 

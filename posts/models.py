@@ -51,6 +51,7 @@ class Comment(models.Model):
         auto_now_add=True
     )
 
+
 class Follow(models.Model):
     user = models.ForeignKey(
         User, on_delete=models.CASCADE, related_name='follower'
