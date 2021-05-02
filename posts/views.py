@@ -97,11 +97,11 @@ def post_edit(request, username, post_id):
                 form.save()
             return redirect('post', username=username, post_id=post_id)
         return render(request, 'new.html', {'form': form, 'post': post})
-    
+
 
 def page_not_found(request, exception):
     return render(
-        request, 
+        request,
         "misc/404.html",
         {"path": request.path},
         status=404
@@ -122,8 +122,8 @@ def add_comment(request, username, post_id):
         created_comment.post = post
         created_comment.save()
         return redirect('post', username=username, post_id=post_id)
-    return render(request, 'profile/post.html', {'form': form,
-                                                 'post': post
+    return render(request, 'profile/post.html', {
+        'form': form, 'post': post
     })
 
 
@@ -135,12 +135,14 @@ def follow_index(request):
     page = paginator.get_page(page_number)
     return render(request, "follow.html", {'page': page})
 
+
 @login_required
 def profile_follow(request, username):
     author = get_object_or_404(User, username=username)
     if author != request.user:
         Follow.objects.get_or_create(user=request.user, author=author)
     return redirect(reverse('profile', args=[username]))
+
 
 @login_required
 def profile_unfollow(request, username):
