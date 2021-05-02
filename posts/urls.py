@@ -4,7 +4,7 @@ from django.conf.urls import handler404, handler500
 from . import views
 
 handler404 = "posts.views.page_not_found"  # noqa
-handler500 = "posts.views.server_error"  # noqa 
+handler500 = "posts.views.server_error"  # noqa
 
 urlpatterns = [
     path("new/", views.new_post, name="new_post"),
@@ -17,7 +17,9 @@ urlpatterns = [
         '<str:username>/<int:post_id>/edit/', views.post_edit, name='post_edit'
     ),
     path('about/', include('about.urls', namespace='about')),
-    path("<username>/<int:post_id>/comment/", views.add_comment, name="add_comment"),
+    path(
+        '<username>/<int:post_id>/comment/', views.add_comment, name="add_comment"
+    ),
     path("<str:username>/follow/", views.profile_follow, name="profile_follow"), 
     path("<str:username>/unfollow/", views.profile_unfollow, name="profile_unfollow"),
 ]

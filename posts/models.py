@@ -30,9 +30,10 @@ class Group(models.Model):
     )
     slug = models.SlugField(unique=True)
     description = models.TextField()
-    
+
     def __str__(self):
         return self.title
+
 
 class Comment(models.Model):
     post = models.ForeignKey(

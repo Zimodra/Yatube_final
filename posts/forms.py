@@ -16,6 +16,7 @@ class PostForm(forms.ModelForm):
             'text': {'required': 'Поле Текст не может быть пустым'}
         }
 
+
 class CommentForm(forms.ModelForm):
     class Meta:
         model = Comment

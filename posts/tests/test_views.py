@@ -189,7 +189,6 @@ class PagesTests(TestCase):
         )
         response_text = response.context['page'][0].text
         response_author = response.context['page'][0].author
-        response_group = response.context['page'][0].group
         response_image = response.context['page'][0].image
         self.assertEqual(response_text, self.post.text)
         self.assertEqual(response_author, self.author)

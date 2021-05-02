@@ -3,10 +3,11 @@ from django.core.paginator import Paginator
 from django.shortcuts import redirect, reverse
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth import get_user_model
-from .models import Post, Group, Comment, Follow
+from .models import Post, Group, Follow
 from .forms import PostForm, CommentForm
 
 User = get_user_model()
+
 
 def index(request):
     post_list = Post.objects.all().order_by('-pub_date')
@@ -129,7 +130,7 @@ def follow_index(request):
 def profile_follow(request, username):
     author = get_object_or_404(User, username=username)
     if author != request.user:
-        Follow.objects.create(user=request.user, author=author)
+        Follow.objects.get_or_create(user=request.user, author=author)
     return redirect(reverse('profile', args=[username]))
 
 @login_required
