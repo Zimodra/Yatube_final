@@ -97,14 +97,13 @@ def post_edit(request, username, post_id):
                 form.save()
             return redirect('post', username=username, post_id=post_id)
         return render(request, 'new.html', {'form': form, 'post': post})
-    return HttpResponseForbidden()
-
+    
 
 def page_not_found(request, exception):
     return render(
         request, 
-        "misc/404.html", 
-        {"path": request.path}, 
+        "misc/404.html",
+        {"path": request.path},
         status=404
     )
 
@@ -118,9 +117,9 @@ def add_comment(request, username, post_id):
     post = get_object_or_404(Post, id=post_id)
     form = CommentForm(request.POST or None)
     if form.is_valid():
-        created_comment=form.save(commit=False)
-        created_comment.author=request.user
-        created_comment.post=post
+        created_comment = form.save(commit=False)
+        created_comment.author = request.user
+        created_comment.post = post
         created_comment.save()
         return redirect('post', username=username, post_id=post_id)
     return render(request, 'profile/post.html', {'form': form,

@@ -212,7 +212,7 @@ class PagesTests(TestCase):
         self.assertEqual(Follow.objects.count(), follow_count + 1)
 
     def test_new_post_for_following(self):
-        follow = Follow.objects.create(user=self.user, author=self.author)
+        Follow.objects.create(user=self.user, author=self.author)
         post = Post.objects.create(
             text='Пост автора',
             author=self.author,
@@ -225,15 +225,17 @@ class PagesTests(TestCase):
         form_data = {
             'text': 'Комментарий',
         }
-        response = self.authorized_client.post(
-            reverse('add_comment', kwargs={'username': self.user, 'post_id': 1}), data=form_data, follow=True
+        self.authorized_client.post(
+            reverse(
+                'add_comment', kwargs={'username': self.user, 'post_id': 1}
+            ), data=form_data, follow=True
         )
         self.assertEqual(Comment.objects.count(), comments_count + 1)
-    
+
     def test_cache_index_page(self):
         response_1 = self.authorized_client.get(reverse('index'))
-        post_1 = Post.objects.create(
-            text='Текстовый текст 1', 
+        Post.objects.create(
+            text='Текстовый текст 1',
             author=self.author
         )
         response_2 = self.authorized_client.get(reverse('index'))
@@ -244,6 +246,6 @@ class PagesTests(TestCase):
         cache.clear()
 
         response_3 = self.authorized_client.get(reverse('index'))
-        
+
         self.assertNotEqual(
             response_2.content, response_3.content)
