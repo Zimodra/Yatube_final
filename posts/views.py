@@ -98,8 +98,7 @@ def post_edit(request, username, post_id):
                 form.save()
             return redirect('post', username=username, post_id=post_id)
         return render(request, 'new.html', {'form': form, 'post': post})
-    else:
-        return redirect('post', username=username, post_id=post_id)
+    return redirect('post', username=username, post_id=post_id)
 
 
 def page_not_found(request, exception):
