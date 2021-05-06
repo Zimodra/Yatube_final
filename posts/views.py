@@ -1,16 +1,16 @@
-from django.shortcuts import render, get_object_or_404
-from django.core.paginator import Paginator
-from django.shortcuts import redirect, reverse
-from django.contrib.auth.decorators import login_required
 from django.contrib.auth import get_user_model
-from .models import Post, Group, Follow
-from .forms import PostForm, CommentForm
+from django.contrib.auth.decorators import login_required
+from django.core.paginator import Paginator
+from django.shortcuts import get_object_or_404, redirect, render, reverse
+
+from .forms import CommentForm, PostForm
+from .models import Follow, Group, Post
 
 User = get_user_model()
 
 
 def index(request):
-    post_list = Post.objects.all().order_by('-pub_date')
+    post_list = Post.objects.all()
     paginator = Paginator(post_list, 10)
     page_number = request.GET.get('page')
     page = paginator.get_page(page_number)
@@ -30,6 +30,7 @@ def group_posts(request, slug):
     return render(request, "group.html", {"group": group, "page": page})
 
 
+@login_required
 def new_post(request):
     if request.method == 'POST':
         form = PostForm(request.POST or None, files=request.FILES)
@@ -45,8 +46,8 @@ def new_post(request):
 
 def profile(request, username):
     author = get_object_or_404(User, username=username)
-    posts_count = author.posts.count()
     posts = author.posts.all()
+    posts_count = author.posts.count()
     paginator = Paginator(posts, 10)
     page_number = request.GET.get('page')
     page = paginator.get_page(page_number)
@@ -97,6 +98,8 @@ def post_edit(request, username, post_id):
                 form.save()
             return redirect('post', username=username, post_id=post_id)
         return render(request, 'new.html', {'form': form, 'post': post})
+    else:
+        return redirect('post', username=username, post_id=post_id)
 
 
 def page_not_found(request, exception):

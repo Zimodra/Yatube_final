@@ -1,14 +1,15 @@
 import shutil
 import tempfile
 
+from django import forms
 from django.conf import settings
-from django.core.files.uploadedfile import SimpleUploadedFile
 from django.contrib.auth import get_user_model
+from django.core.cache import cache
+from django.core.files.uploadedfile import SimpleUploadedFile
 from django.test import Client, TestCase
 from django.urls import reverse
-from django import forms
-from django.core.cache import cache
-from posts.models import Group, Post, Follow, Comment
+
+from posts.models import Comment, Follow, Group, Post
 
 User = get_user_model()
 
@@ -194,22 +195,28 @@ class PagesTests(TestCase):
         self.assertEqual(response_author, self.author)
         self.assertEqual(response_image, self.post.image)
 
-    def test_follow_on_other_authors(self):
-        follow_count = Follow.objects.count()
+    def test_authorized_user_follow_unfollow(self):
+        follow_count_for_follow = Follow.objects.count()
         Follow.objects.create(user=self.user, author=self.author)
         form_data = {
             'user': 'follower',
             'author': self.author,
         }
-        response = self.authorized_client.get(
+        response_follow = self.authorized_client.get(
             reverse(
                 'profile_follow', kwargs={'username': self.user}
             ), data=form_data, follow=True
         )
         self.assertRedirects(
-            response, reverse('profile', kwargs={'username': self.user})
+            response_follow, reverse('profile', kwargs={'username': self.user})
         )
-        self.assertEqual(Follow.objects.count(), follow_count + 1)
+        self.assertEqual(Follow.objects.count(), follow_count_for_follow + 1)
+
+        self.authorized_client.get(reverse(
+            'profile_unfollow', kwargs={'username': self.user}
+        ))
+        follow_count_for_unfollow = Follow.objects.count()
+        self.assertEqual(Follow.objects.count(), follow_count_for_unfollow)
 
     def test_new_post_for_following(self):
         Follow.objects.create(user=self.user, author=self.author)

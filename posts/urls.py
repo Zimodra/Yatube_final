@@ -1,6 +1,6 @@
-from django.urls import path
-from django.urls import include, path
 from django.conf.urls import handler404, handler500
+from django.urls import include, path
+
 from . import views
 
 handler404 = "posts.views.page_not_found"  # noqa
