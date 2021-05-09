@@ -32,6 +32,7 @@ def group_posts(request, slug):
 
 @login_required
 def new_post(request):
+    form = PostForm()
     if request.method == 'POST':
         form = PostForm(request.POST or None, files=request.FILES)
         if form.is_valid():
@@ -40,14 +41,12 @@ def new_post(request):
             post.save()
             return redirect('index')
         return render(request, 'new.html', {'form': form})
-    form = PostForm()
     return render(request, 'new.html', {'form': form})
 
 
 def profile(request, username):
     author = get_object_or_404(User, username=username)
     posts = author.posts.all()
-    posts_count = author.posts.count()
     paginator = Paginator(posts, 10)
     page_number = request.GET.get('page')
     page = paginator.get_page(page_number)
@@ -62,7 +61,6 @@ def profile(request, username):
     context = {
         'author': author,
         'page': page,
-        'posts_count': posts_count,
         'posts': posts,
         'following': following
     }

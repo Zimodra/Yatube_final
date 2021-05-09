@@ -14,7 +14,7 @@ from posts.models import Comment, Follow, Group, Post
 User = get_user_model()
 
 
-class PagesTests(TestCase):
+class PostTest(TestCase):
     @classmethod
     def setUpClass(cls):
         super().setUpClass()
@@ -114,13 +114,13 @@ class PagesTests(TestCase):
             reverse('group', kwargs={'slug': 'testing_slug'})
         )
         self.assertNotIn(
-            self.post, response.context.get('page').paginator.object_list
+            PostTest.post, response.context.get('page').paginator.object_list
         )
         self.assertIn(
-            self.post, response_index.context.get('page').paginator.object_list
+            PostTest.post, response_index.context.get('page').paginator.object_list
         )
         self.assertIn(
-            self.post, response_group.context.get('page').paginator.object_list
+            PostTest.post, response_group.context.get('page').paginator.object_list
         )
 
     def test_post_edit_correct_context(self):
@@ -129,8 +129,8 @@ class PagesTests(TestCase):
         )
         group = Post.objects.filter(pk='1')
         context = {
-            self.post.text: response_post_edit.context['form'].initial['text'],
-            PagesTests.group.title: group[0].group.title
+            PostTest.post.text: response_post_edit.context['form'].initial['text'],
+            PostTest.group.title: group[0].group.title
         }
         for value, expected in context.items():
             with self.subTest(value=value):
@@ -140,25 +140,25 @@ class PagesTests(TestCase):
             reverse('profile', kwargs={'username': 'Oleg'})
         )
         self.assertEqual(
-            response_profile.context['page'][0].text, self.post.text
+            response_profile.context['page'][0].text, PostTest.post.text
         )
         self.assertEqual(
-            response_profile.context['page'][0].author, self.post.author
+            response_profile.context['page'][0].author, PostTest.post.author
         )
         self.assertEqual(
-            response_profile.context['page'][0].group, self.post.group
+            response_profile.context['page'][0].group, PostTest.post.group
         )
         self.assertEqual(
-            response_profile.context['page'][0].image, self.post.image
+            response_profile.context['page'][0].image, PostTest.post.image
         )
         response_post = self.authorized_author.get(
             reverse('post', kwargs={'username': 'Oleg', 'post_id': 1})
         )
-        self.assertEqual(response_post.context['post'].text, self.post.text)
+        self.assertEqual(response_post.context['post'].text, PostTest.post.text)
         self.assertEqual(
-            response_post.context['post'].author, self.post.author
+            response_post.context['post'].author, PostTest.post.author
         )
-        self.assertEqual(response_post.context['post'].group, self.post.group)
+        self.assertEqual(response_post.context['post'].group, PostTest.post.group)
 
     def test_about_url(self):
         response_author = self.guest_client.get(
@@ -191,11 +191,11 @@ class PagesTests(TestCase):
         response_text = response.context['page'][0].text
         response_author = response.context['page'][0].author
         response_image = response.context['page'][0].image
-        self.assertEqual(response_text, self.post.text)
+        self.assertEqual(response_text, PostTest.post.text)
         self.assertEqual(response_author, self.author)
-        self.assertEqual(response_image, self.post.image)
+        self.assertEqual(response_image, PostTest.post.image)
 
-    def test_authorized_user_follow_unfollow(self):
+    def test_authorized_user_follow(self):
         follow_count_for_follow = Follow.objects.count()
         Follow.objects.create(user=self.user, author=self.author)
         form_data = {
@@ -212,11 +212,12 @@ class PagesTests(TestCase):
         )
         self.assertEqual(Follow.objects.count(), follow_count_for_follow + 1)
 
+    def test_authorized_user_unfollow(self):
         self.authorized_client.get(reverse(
             'profile_unfollow', kwargs={'username': self.user}
         ))
-        follow_count_for_unfollow = Follow.objects.count()
-        self.assertEqual(Follow.objects.count(), follow_count_for_unfollow)
+        follow_count = Follow.objects.count()
+        self.assertEqual(Follow.objects.count(), follow_count)
 
     def test_new_post_for_following(self):
         Follow.objects.create(user=self.user, author=self.author)
