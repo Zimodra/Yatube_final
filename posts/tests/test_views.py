@@ -117,10 +117,12 @@ class PostTest(TestCase):
             PostTest.post, response.context.get('page').paginator.object_list
         )
         self.assertIn(
-            PostTest.post, response_index.context.get('page').paginator.object_list
+            PostTest.post,
+            response_index.context.get('page').paginator.object_list
         )
         self.assertIn(
-            PostTest.post, response_group.context.get('page').paginator.object_list
+            PostTest.post,
+            response_group.context.get('page').paginator.object_list
         )
 
     def test_post_edit_correct_context(self):
@@ -129,7 +131,8 @@ class PostTest(TestCase):
         )
         group = Post.objects.filter(pk='1')
         context = {
-            PostTest.post.text: response_post_edit.context['form'].initial['text'],
+            PostTest.post.text:
+            response_post_edit.context['form'].initial['text'],
             PostTest.group.title: group[0].group.title
         }
         for value, expected in context.items():
@@ -154,11 +157,15 @@ class PostTest(TestCase):
         response_post = self.authorized_author.get(
             reverse('post', kwargs={'username': 'Oleg', 'post_id': 1})
         )
-        self.assertEqual(response_post.context['post'].text, PostTest.post.text)
+        self.assertEqual(
+            response_post.context['post'].text, PostTest.post.text
+        )
         self.assertEqual(
             response_post.context['post'].author, PostTest.post.author
         )
-        self.assertEqual(response_post.context['post'].group, PostTest.post.group)
+        self.assertEqual(
+            response_post.context['post'].group, PostTest.post.group
+        )
 
     def test_about_url(self):
         response_author = self.guest_client.get(
