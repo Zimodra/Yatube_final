@@ -12,6 +12,6 @@
 
 - Django
 - Pytest-django
-- 
+
 ## License
 MIT Free Software, Hell Yeah!
